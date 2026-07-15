@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pseudo Checker</title>
+
+
+<style>
+
+* {
+    box-sizing:border-box;
+}
+
+
+body {
+
+    margin:0;
+    padding:20px;
+
+    background:#050505;
+
+    color:white;
+
+    font-family:Arial, sans-serif;
+
+}
+
+
+h1 {
+
+    text-align:center;
+
+}
+
+
+
+.panel {
+
+    background:#111;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    margin-top:15px;
+
+}
+
+
+
+button {
+
+    width:45%;
+
+    padding:15px;
+
+    margin:5px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+
+
+.start {
+
+    background:#00c853;
+
+    color:white;
+
+}
+
+
+
+.stop {
+
+    background:#d50000;
+
+    color:white;
+
+}
+
+
+
+#console {
+
+
+    height:350px;
+
+    overflow-y:auto;
+
+    background:#000;
+
+    border:1px solid #333;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    font-family:monospace;
+
+
+}
+
+
+
+.test {
+
+    color:#aaa;
+
+    margin-bottom:5px;
+
+}
+
+
+
+.available {
+
+
+    color:#00ff66;
+
+    font-weight:bold;
+
+
+}
+
+
+
+.taken {
+
+
+    color:#ff3333;
+
+    font-weight:bold;
+
+
+}
+
+
+
+.info {
+
+
+    color:#00aaff;
+
+
+}
+
+
+
+</style>
+
+
+</head>
+
+
+
+<body>
+
+
+
+<h1>🎲 Pseudo Checker</h1>
+
+
+
+<div class="panel">
+
+
+<center>
+
+
+<button class="start" onclick="startChecker()">
+
+▶ Commencer
+
+</button>
+
+
+
+<button class="stop" onclick="stopChecker()">
+
+⏹ Arrêter
+
+</button>
+
+
+</center>
+
+
+</div>
+
+
+
+
+<div class="panel">
+
+
+<div id="status">
+
+🔴 Arrêté
+
+</div>
+
+
+<div>
+
+Tests :
+<span id="count">
+
+0
+
+</span>
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="panel">
+
+
+<h3>Console</h3>
+
+
+<div id="console">
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+let running=false;
+
+let timer=null;
+
+let count=0;
+
+
+
+
+
+function log(message,type="test"){
+
+
+    let consoleBox =
+    document.getElementById("console");
+
+
+
+    let line =
+    document.createElement("div");
+
+
+
+    line.className=type;
+
+
+
+    line.textContent=message;
+
+
+
+    consoleBox.appendChild(line);
+
+
+
+    consoleBox.scrollTop =
+    consoleBox.scrollHeight;
+
+
+}
+
+
+
+
+
+
+
+async function testPseudo(){
+
+
+    if(!running)
+    return;
+
+
+
+
+    try {
+
+
+
+        let response =
+        await fetch("/check");
+
+
+
+        let data =
+        await response.json();
+
+
+
+        count++;
+
+
+        document.getElementById("count")
+        .textContent=count;
+
+
+
+
+        log(
+        "🔎 Test : "+data.url,
+        "test"
+        );
+
+
+
+
+        if(data.status==="available"){
+
+
+
+            log(
+            "🟢 DISPO : "+data.pseudo,
+            "available"
+            );
+
+
+        }
+
+
+
+        else if(data.status==="taken"){
+
+
+
+            log(
+            "🔴 PRIS : "+data.pseudo,
+            "taken"
+            );
+
+
+        }
+
+
+
+        else {
+
+
+
+            log(
+            "⚪ Inconnu : "+data.pseudo,
+            "info"
+            );
+
+
+        }
+
+
+
+    }
+
+
+
+    catch(error){
+
+
+
+        log(
+        "⚠ Erreur serveur",
+        "taken"
+        );
+
+
+    }
+
+
+
+
+
+
+    timer=setTimeout(
+    testPseudo,
+    5000
+    );
+
+
+}
+
+
+
+
+
+
+function startChecker(){
+
+
+    if(running)
+    return;
+
+
+
+    running=true;
+
+
+
+    document.getElementById("status")
+    .textContent="🟢 En fonctionnement";
+
+
+
+    log(
+    "▶ Checker démarré",
+    "info"
+    );
+
+
+
+    testPseudo();
+
+
+}
+
+
+
+
+
+
+
+function stopChecker(){
+
+
+    running=false;
+
+
+
+    clearTimeout(timer);
+
+
+
+    document.getElementById("status")
+    .textContent="🔴 Arrêté";
+
+
+
+    log(
+    "⏹ Checker arrêté",
+    "info"
+    );
+
+
+}
+
+
+
+
+</script>
+
+
+</body>
+
+
+</html>
