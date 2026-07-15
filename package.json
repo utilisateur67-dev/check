@@ -1,0 +1,12 @@
+{
+  "name": "pseudo-checker",
+  "version": "1.0.0",
+  "description": "Generateur et verificateur de pseudos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
